@@ -41,7 +41,7 @@ sudo systemctl start apache2.service
 sudo systemctl enable apache2.service
 
 # Install PHP
-sudo apt -y install vim php libapache2-mod-php php-{gd,common,mail,mail-mime,mysql,pear,db,mbstring,xml,curl,zip} 
+sudo apt -y install vim php libapache2-mod-php php-gd,php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl phpzip 
 
 # Install MariaDB
 sudo apt -y install mariadb-server mariadb-client
@@ -66,19 +66,19 @@ sudo systemctl start freeradius
 sudo systemctl enable freeradius
 
 # Once installed, import the freeradius MySQL database schema with the following command:
-sudo mysql -u root -p radius < /etc/freeradius/*/mods-config/sql/main/mysql/schema.sql
+sudo mysql -u root -p radius < /etc/freeradius/3.0/mods-config/sql/main/mysql/schema.sql
 sudo mysql -u root -p -e "use radius;show tables;"
 
 # Create a soft link for sql module under
-sudo ln -s /etc/freeradius/*/mods-available/sql /etc/freeradius/*/mods-enabled/
+sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/*/mods-enabled/
 
 #Run the following commands to create the Certificate Authority (CA) keys:
 cd /etc/ssl/certs/
-sudo openssl genrsa 2048 > ca-key.pem
-sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
+#sudo openssl genrsa 2048 > ca-key.pem
+#sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
 #Make the following changes as per your database:
-sudo cat <<EOF > /etc/freeradius/*/mods-enabled/sql
+sudo cat <<EOF > /etc/freeradius/3.0/mods-enabled/sql
 
 sql {
 driver = "rlm_sql_mysql"
@@ -123,8 +123,8 @@ mysql {
 EOF
 
 # Set the proper permission
-sudo chgrp -h freerad /etc/freeradius/*/mods-available/sql
-sudo chown -R freerad:freerad /etc/freeradius/*/mods-enabled/sql
+sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
+sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
 
 sudo systemctl restart freeradius.service
 
