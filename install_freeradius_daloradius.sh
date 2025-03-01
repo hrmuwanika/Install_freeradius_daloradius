@@ -175,6 +175,9 @@ sudo tee /etc/apache2/ports.conf<<EOF
    </IfModule>
 EOF
 
+mkdir /var/log/apache2/daloradius/users
+mkdir /var/log/apache2/daloradius/operators
+
 sudo tee /etc/apache2/sites-available/operators.conf<<EOF
 <VirtualHost *:8000>
     ServerAdmin operators@localhost
