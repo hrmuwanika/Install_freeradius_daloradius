@@ -137,8 +137,10 @@ git clone https://github.com/lirantal/daloradius.git
 mysql -u root -p radius < daloradius/contrib/db/fr3-mariadb-freeradius.sql
 mysql -u root -p radius < daloradius/contrib/db/mariadb-daloradius.sql
 
-cd ..
 sudo mv daloradius /var/www/html/
+
+sudo chown -R www-data:www-data /var/www/html/daloradius
+sudo chmod -R 755 /var/www/html/daloradius
 
 cd /var/www/html/daloradius/app/common/includes/
 sudo cp daloradius.conf.php.sample daloradius.conf.php
