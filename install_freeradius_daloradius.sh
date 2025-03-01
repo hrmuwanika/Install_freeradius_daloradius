@@ -97,7 +97,7 @@ mysql -u root -p radius < daloradius/contrib/db/mariadb-daloradius.sql
 
 sudo mv daloradius /var/www/html/
 
-sudo chown -R www-data:www-data /var/www/html/daloradius
+sudo chown -R www-data:www-data /var/www/html/daloradius/
 sudo chmod -R 755 /var/www/html/daloradius
 
 cd /var/www/html/daloradius/app/common/includes/
@@ -105,24 +105,14 @@ sudo cp daloradius.conf.php.sample daloradius.conf.php
 sudo chown www-data:www-data daloradius.conf.php
 
 #Make the following changes that match your database:
-sudo tee -a /var/www/html/daloradius/library/daloradius.conf.php <<EOF
-
-$configValues['CONFIG_DB_ENGINE'] = 'mysqli';
-$configValues['CONFIG_DB_HOST'] = 'localhost';
-$configValues['CONFIG_DB_PORT'] = '3306';
-$configValues['CONFIG_DB_USER'] = 'radiususer';
-$configValues['CONFIG_DB_PASS'] = 'G@s%w&rJ';
-$configValues['CONFIG_DB_NAME'] = 'radius';
-EOF
+sudo nano /var/www/html/daloradius/library/daloradius.conf.php 
 
 sudo chmod 664 /var/www/html/daloradius/library/daloradius.conf.php
 
 cd /var/www/html/daloradius/
 sudo mkdir -p var/{log,backup}
-sudo chown -R www-data:www-data var
 
 sudo tee /etc/apache2/ports.conf<<EOF
-
   Listen 80
   Listen 8000
 
@@ -181,7 +171,6 @@ sudo a2dissite 000-default.conf
 sudo mkdir /var/log/apache2/daloradius/users
 sudo mkdir /var/log/apache2/daloradius/operators
 
-sudo chown -R www-data:www-data /var/www/html/daloradius/
 sudo systemctl restart freeradius.service 
 sudo systemctl restart apache2.service
 
