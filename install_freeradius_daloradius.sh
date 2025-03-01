@@ -49,14 +49,15 @@ sudo systemctl start mariadb.service
 sudo systemctl enable mariadb.service
 
 # Configure Database for FreeRADIUS
-# sudo mysql_secure_installation
+# sudo mariadb-secure-installation
 
 sudo mariadb -uroot --password="" -e "CREATE DATABASE raddb;"
 sudo mariadb -uroot --password="" -e "CREATE USER 'raduser'@'localhost' IDENTIFIED BY 'radpass';"
 sudo mariadb -uroot --password="" -e "GRANT ALL PRIVILEGES ON raddb.* TO 'raduser'@'localhost';"
 sudo mariadb -uroot --password="" -e "FLUSH PRIVILEGES;"
 
-sudo systemctl restart mysql.service
+sudo systemctl enable mariadb.service
+sudo systemctl restart mariadb.service
 
 # Install FreeRADIUS
 sudo apt policy freeradius -y
@@ -70,12 +71,12 @@ sudo mariadb -u root -p -e "use raddb;show tables;"
 # Create a soft link for sql module under
 sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/
 
-#Run the following commands to create the Certificate Authority (CA) keys:
+# Run the following commands to create the Certificate Authority (CA) keys:
 cd /etc/ssl/certs/
-sudo openssl genrsa 2048 > ca-key.pem
-sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
+# sudo openssl genrsa 2048 > ca-key.pem
+# sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
-#Make the following changes as per your database:
+# Make the following changes as per your database:
 sudo nano /etc/freeradius/3.0/mods-enabled/sql
 
 sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-available/sql
@@ -110,6 +111,7 @@ sudo chmod -R 664 daloradius.conf.php
 
 chown www-data:www-data /var/www/html/daloradius/contrib/scripts/dalo-crontab
 
+chown -R www-data:www-data /var/log/syslog
 cd /var/www/html/daloradius/
 mkdir -p var/{log,backup}
 chown -R www-data:www-data var  
