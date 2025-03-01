@@ -97,7 +97,7 @@ mysql -u root -p radius < daloradius/contrib/db/mariadb-daloradius.sql
 sudo mv daloradius /var/www/html/
 
 sudo chown -R www-data:www-data /var/www/html/daloradius/
-sudo chmod -R 755 /var/www/html/daloradius
+sudo chmod -R 755 /var/www/html/daloradius/
 
 cd /var/www/html/daloradius/app/common/includes/
 sudo cp daloradius.conf.php.sample daloradius.conf.php
@@ -107,12 +107,11 @@ sudo chown www-data:www-data daloradius.conf.php
 sudo nano daloradius.conf.php 
 sudo chmod -R 664 daloradius.conf.php
 
-cd /var/www/html/daloradius/
-sudo mkdir -p var/{log,backup}
+# sudo mkdir -p var/{log,backup}
 
 sudo tee /etc/apache2/ports.conf<<EOF
-  Listen 80
-  Listen 8000
+    Listen 80
+    Listen 8000
 
   <IfModule ssl_module>
     Listen 443
@@ -125,8 +124,8 @@ EOF
 
 sudo tee /etc/apache2/sites-available/operators.conf<<EOF
 <VirtualHost *:8000>
-    ServerAdmin operators@localhost
-    DocumentRoot /var/www/html/daloradius/app/operators
+        ServerAdmin operators@localhost
+        DocumentRoot /var/www/html/daloradius/app/operators
 
     <Directory /var/www/html/daloradius/app/operators>
         Options -Indexes +FollowSymLinks
@@ -138,15 +137,15 @@ sudo tee /etc/apache2/sites-available/operators.conf<<EOF
         Require all denied
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/daloradius/operators/error.log
-    CustomLog \${APACHE_LOG_DIR}/daloradius/operators/access.log combined
+        ErrorLog \${APACHE_LOG_DIR}/daloradius/operators/error.log
+        CustomLog \${APACHE_LOG_DIR}/daloradius/operators/access.log combined
 </VirtualHost>
 EOF
 
 sudo tee /etc/apache2/sites-available/users.conf<<EOF
 <VirtualHost *:80>
-    ServerAdmin users@localhost
-    DocumentRoot /var/www/html/daloradius/app/users
+        ServerAdmin users@localhost
+        DocumentRoot /var/www/html/daloradius/app/users
 
     <Directory /var/www/html/daloradius/app/users>
         Options -Indexes +FollowSymLinks
@@ -158,14 +157,16 @@ sudo tee /etc/apache2/sites-available/users.conf<<EOF
         Require all denied
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/daloradius/users/error.log
-    CustomLog \${APACHE_LOG_DIR}/daloradius/users/access.log combined
+        ErrorLog \${APACHE_LOG_DIR}/daloradius/users/error.log
+        CustomLog \${APACHE_LOG_DIR}/daloradius/users/access.log combined
 </VirtualHost>
 EOF
 
 sudo a2ensite users.conf 
 sudo a2ensite operators.conf
 sudo a2dissite 000-default.conf
+
+sudo mkdir /var/log/apache2/daloradius/
 sudo mkdir /var/log/apache2/daloradius/users
 sudo mkdir /var/log/apache2/daloradius/operators
 
@@ -173,7 +174,6 @@ sudo systemctl restart freeradius.service
 sudo systemctl restart apache2.service
 
 # Visit: 
-clear
 echo "access via http://localhost:8000/login.php"
 echo "Username: administrator"
 echo "Password: radius"
