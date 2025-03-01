@@ -41,7 +41,7 @@ sudo systemctl start apache2.service
 sudo systemctl enable apache2.service
 
 # Install PHP
-sudo apt -y install php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip 
+sudo apt -y install php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip rsyslog
 
 # Install MariaDB
 sudo apt -y install mariadb-server mariadb-client
@@ -51,50 +51,51 @@ sudo systemctl enable mariadb.service
 # Configure Database for FreeRADIUS
 # sudo mysql_secure_installation
 
-sudo mysql -uroot --password="" -e "CREATE DATABASE radius;"
-sudo mysql -uroot --password="" -e "CREATE USER 'radiususer'@'localhost' IDENTIFIED BY 'G@s%w&rJ';"
-sudo mysql -uroot --password="" -e "GRANT ALL PRIVILEGES ON radius.* TO 'radiususer'@'localhost';"
-sudo mysql -uroot --password="" -e "FLUSH PRIVILEGES;"
+sudo mariadb -uroot --password="" -e "CREATE DATABASE raddb;"
+sudo mariadb -uroot --password="" -e "CREATE USER 'raduser'@'localhost' IDENTIFIED BY 'radpass';"
+sudo mariadb -uroot --password="" -e "GRANT ALL PRIVILEGES ON raddb.* TO 'raduser'@'localhost';"
+sudo mariadb -uroot --password="" -e "FLUSH PRIVILEGES;"
 
 sudo systemctl restart mysql.service
 
 # Install FreeRADIUS
 sudo apt policy freeradius -y
 sudo apt -y install freeradius freeradius-mysql freeradius-utils
-sudo systemctl start freeradius
-sudo systemctl enable freeradius
 
 # Once installed, import the freeradius MySQL database schema with the following command:
-sudo mysql -u root -p radius < /etc/freeradius/3.0/mods-config/sql/main/mysql/schema.sql
-sudo mysql -u root -p -e "use radius;show tables;"
+cd /etc/freeradius/3.0/mods-config/sql/main/mysql
+sudo mariadb -u root -p raddb < schema.sql
+sudo mariadb -u root -p -e "use raddb;show tables;"
 
 # Create a soft link for sql module under
-sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/*/mods-enabled/
+sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/
 
 #Run the following commands to create the Certificate Authority (CA) keys:
 cd /etc/ssl/certs/
-#sudo openssl genrsa 2048 > ca-key.pem
-#sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
+sudo openssl genrsa 2048 > ca-key.pem
+sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
 #Make the following changes as per your database:
 sudo nano /etc/freeradius/3.0/mods-enabled/sql
+
+sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-available/sql
 
 # Set the proper permission
 sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
 sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
 
+sudo systemctl enable freeradius.service
 sudo systemctl restart freeradius.service
 
 # Install daloradius
-cd /usr/src/
+cd /var/www/html/
 sudo apt -y install git
 git clone https://github.com/lirantal/daloradius.git
 
 # Configuring daloradius
-mysql -u root -p radius < daloradius/contrib/db/fr3-mariadb-freeradius.sql
-mysql -u root -p radius < daloradius/contrib/db/mariadb-daloradius.sql
-
-sudo mv daloradius /var/www/html/
+cd /var/www/html/daloradius/contrib/db/
+mariadb -u root -p raddb < fr3-mariadb-freeradius.sql
+mariadb -u root -p raddb < mariadb-daloradius.sql
 
 sudo chown -R www-data:www-data /var/www/html/daloradius/
 sudo chmod -R 755 /var/www/html/daloradius/
@@ -107,7 +108,12 @@ sudo chown www-data:www-data daloradius.conf.php
 sudo nano daloradius.conf.php 
 sudo chmod -R 664 daloradius.conf.php
 
-# sudo mkdir -p var/{log,backup}
+chown www-data:www-data /var/www/html/daloradius/contrib/scripts/dalo-crontab
+
+cd /var/www/html/daloradius/
+mkdir -p var/{log,backup}
+chown -R www-data:www-data var  
+chmod -R 775 var
 
 sudo tee /etc/apache2/ports.conf<<EOF
     Listen 80
