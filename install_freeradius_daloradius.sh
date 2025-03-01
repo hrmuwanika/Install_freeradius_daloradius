@@ -41,7 +41,7 @@ sudo systemctl start apache2.service
 sudo systemctl enable apache2.service
 
 # Install PHP
-sudo apt -y install vim php libapache2-mod-php php-gd,php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip 
+sudo apt -y install vim php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip 
 
 # Install MariaDB
 sudo apt -y install mariadb-server mariadb-client
@@ -177,9 +177,6 @@ sudo tee /etc/apache2/ports.conf<<EOF
    </IfModule>
 EOF
 
-mkdir /var/log/apache2/daloradius/users
-mkdir /var/log/apache2/daloradius/operators
-
 sudo tee /etc/apache2/sites-available/operators.conf<<EOF
 <VirtualHost *:8000>
     ServerAdmin operators@localhost
@@ -220,9 +217,11 @@ sudo tee /etc/apache2/sites-available/users.conf<<EOF
 </VirtualHost>
 EOF
 
-sudo a2ensite users.conf operators.conf
+sudo a2ensite users.conf 
+sudo a2ensite operators.conf
 sudo a2dissite 000-default.conf
-sudo mkdir -p /var/log/apache2/daloradius/{operators,users}
+sudo mkdir /var/log/apache2/daloradius/users
+sudo mkdir /var/log/apache2/daloradius/operators
 
 sudo chown -R www-data:www-data /var/www/html/daloradius/
 sudo systemctl restart freeradius.service 
