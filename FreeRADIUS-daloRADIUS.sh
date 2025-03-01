@@ -66,7 +66,6 @@ sudo systemctl start freeradius
 sudo systemctl enable freeradius
 
 # Once installed, import the freeradius MySQL database schema with the following command:
-sudo su -
 sudo mysql -u root -p radius < /etc/freeradius/*/mods-config/sql/main/mysql/schema.sql
 sudo mysql -u root -p -e "use radius;show tables;"
 
@@ -135,7 +134,6 @@ sudo apt -y install git
 git clone https://github.com/lirantal/daloradius.git
 
 # Configuring daloradius
-sudo su -
 mysql -u root -p radius < daloradius/contrib/db/fr3-mariadb-freeradius.sql
 mysql -u root -p radius < daloradius/contrib/db/mariadb-daloradius.sql
 
