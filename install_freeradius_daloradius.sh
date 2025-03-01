@@ -41,7 +41,7 @@ sudo systemctl start apache2.service
 sudo systemctl enable apache2.service
 
 # Install PHP
-sudo apt -y install vim php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip 
+sudo apt -y install php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip 
 
 # Install MariaDB
 sudo apt -y install mariadb-server mariadb-client
@@ -78,49 +78,7 @@ cd /etc/ssl/certs/
 #sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
 #Make the following changes as per your database:
-sudo cat <<EOF > /etc/freeradius/3.0/mods-enabled/sql
-
-sql {
-driver = "rlm_sql_mysql"
-dialect = "mysql"
-
-# Connection info:
-server = "localhost"
-port = 3306
-login = "radiususer"
-password = "G@s%w&rJ"
-
-# Database table configuration for everything except Oracle
-radius_db = "radius"
-}
-
-# Set to ‘yes’ to read radius clients from the database (‘nas’ table)
-# Clients will ONLY be read on server startup.
-read_clients = yes
-
-# Table to keep radius client info
-client_table = "nas"
-
-mysql {
-                # If any of the files below are set, TLS encryption is enabled
-#               tls {
-#                       ca_file = "/etc/ssl/certs/my_ca.crt"
-#                       ca_path = "/etc/ssl/certs/"
-#                       certificate_file = "/etc/ssl/certs/private/client.crt"
-#                       private_key_file = "/etc/ssl/certs/private/client.key"
-#                       cipher = "DHE-RSA-AES256-SHA:AES128-SHA"
-#
-#                       tls_required = yes
-#                       tls_check_cert = no
-#                       tls_check_cert_cn = no
-#               }
-
-                # If yes, (or auto and libmysqlclient reports warnings are
-                # available), will retrieve and log additional warnings from
-                # the server if an error has occured. Defaults to 'auto'
-                warnings = auto
-        }
-EOF
+sudo nano /etc/freeradius/3.0/mods-enabled/sql
 
 # Set the proper permission
 sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
