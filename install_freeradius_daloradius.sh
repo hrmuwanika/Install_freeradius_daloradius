@@ -55,7 +55,6 @@ sudo mysql -uroot --password="" -e "CREATE DATABASE radius;"
 sudo mysql -uroot --password="" -e "CREATE USER 'radiususer'@'localhost' IDENTIFIED BY 'G@s%w&rJ';"
 sudo mysql -uroot --password="" -e "GRANT ALL PRIVILEGES ON radius.* TO 'radiususer'@'localhost';"
 sudo mysql -uroot --password="" -e "FLUSH PRIVILEGES;"
-sudo mysqladmin -uroot --password="" reload 2>/dev/null
 
 sudo systemctl restart mysql.service
 
@@ -86,7 +85,7 @@ sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
 
 sudo systemctl restart freeradius.service
 
-# Install daloRADIUS
+# Install daloradius
 cd /usr/src/
 sudo apt -y install git
 git clone https://github.com/lirantal/daloradius.git
@@ -104,10 +103,9 @@ cd /var/www/html/daloradius/app/common/includes/
 sudo cp daloradius.conf.php.sample daloradius.conf.php
 sudo chown www-data:www-data daloradius.conf.php
 
-#Make the following changes that match your database:
-sudo nano /var/www/html/daloradius/library/daloradius.conf.php 
-
-sudo chmod 664 /var/www/html/daloradius/library/daloradius.conf.php
+# Make the following changes that match your database:
+sudo nano daloradius.conf.php 
+sudo chmod -R 664 daloradius.conf.php
 
 cd /var/www/html/daloradius/
 sudo mkdir -p var/{log,backup}
@@ -122,7 +120,7 @@ sudo tee /etc/apache2/ports.conf<<EOF
 
   <IfModule mod_gnutls.c>
      Listen 443
-   </IfModule>
+  </IfModule>
 EOF
 
 sudo tee /etc/apache2/sites-available/operators.conf<<EOF
@@ -176,7 +174,7 @@ sudo systemctl restart apache2.service
 
 # Visit: 
 clear
-echo "access via http://localhost/daloradius/login.php"
+echo "access via http://localhost:8000/login.php"
 echo "Username: administrator"
 echo "Password: radius"
 
