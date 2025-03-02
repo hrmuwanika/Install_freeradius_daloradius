@@ -1,14 +1,7 @@
 #!/bin/sh
 
 # Set default values for variables
-DB_HOST=localhost
-DB_PORT=3306
-DALORADIUS_USERS_PORT=80
-DALORADIUS_OPERATORS_PORT=8000
-DALORADIUS_ROOT_DIRECTORY=/var/www/daloradius
-DALORADIUS_CONF_FILE="${DALORADIUS_ROOT_DIRECTORY}/app/common/includes/daloradius.conf.php"
-DALORADIUS_SERVER_ADMIN=admin@daloradius.local
-FREERADIUS_SQL_MOD_PATH="/etc/freeradius/3.0/mods-available/sql"
+
 
 #--------------------------------------------------
 # Update Server
