@@ -49,7 +49,8 @@ sudo systemctl start apache2.service
 sudo systemctl enable apache2.service
 
 # Install PHP
-sudo apt -y install php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip rsyslog
+sudo apt -y install php libapache2-mod-php php-gd php-common php-mail php-mail-mime php-mysql php-pear php-db php-mbstring php-xml php-curl php-zip \
+php-imagick rsyslog postfix
 
 # Install MariaDB
 sudo apt -y install mariadb-server mariadb-client
