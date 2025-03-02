@@ -85,19 +85,19 @@ sudo systemctl restart mariadb.service
 # sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
 # Make the following changes as per your database:
-sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei 's/^[\t\s#]*dialect\s+=\s+.*$/\tdialect = "mysql"/g' /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei 's/^[\t\s#]*driver\s+=\s+"rlm_sql_null"/\tdriver = "rlm_sql_\${dialect}"/g' /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei "s/^[\t\s#]*server\s+=\s+\"localhost\"/\tserver = \"${DB_HOST}\"/g" /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei "s/^[\t\s#]*port\s+=\s+[0-9]+/\tport = ${DB_PORT}/g" /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei "s/^[\t\s#]*login\s+=\s+\"radius\"/\tlogin = \"${DB_USER}\"/g" /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei "s/^[\t\s#]*password\s+=\s+\"radpass\"/\tpassword = \"${DB_PASS}\"/g" /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei "s/^[\t\s#]*radius_db\s+=\s+\"radius\"/\tradius_db = \"${DB_SCHEMA}\"/g" /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei 's/^[\t\s#]*read_clients\s+=\s+.*$/\tread_clients = yes/g' /etc/freeradius/3.0/mods-enabled/sql
-sed -Ei 's/^[\t\s#]*client_table\s+=\s+.*$/\tclient_table = "nas"/g' /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-available/sql
+sed -Ei 's/^[\t\s#]*dialect\s+=\s+.*$/\tdialect = "mysql"/g' /etc/freeradius/3.0/mods-available/sql
+sed -Ei 's/^[\t\s#]*driver\s+=\s+"rlm_sql_null"/\tdriver = "rlm_sql_\${dialect}"/g' /etc/freeradius/3.0/mods-available/sql
+sed -Ei "s/^[\t\s#]*server\s+=\s+\"localhost\"/\tserver = \"${DB_HOST}\"/g" /etc/freeradius/3.0/mods-available/sql
+sed -Ei "s/^[\t\s#]*port\s+=\s+[0-9]+/\tport = ${DB_PORT}/g" /etc/freeradius/3.0/mods-available/sql
+sed -Ei "s/^[\t\s#]*login\s+=\s+\"radius\"/\tlogin = \"${DB_USER}\"/g" /etc/freeradius/3.0/mods-available/sql
+sed -Ei "s/^[\t\s#]*password\s+=\s+\"radpass\"/\tpassword = \"${DB_PASS}\"/g" /etc/freeradius/3.0/mods-available/sql
+sed -Ei "s/^[\t\s#]*radius_db\s+=\s+\"radius\"/\tradius_db = \"${DB_SCHEMA}\"/g" /etc/freeradius/3.0/mods-available/sql
+sed -Ei 's/^[\t\s#]*read_clients\s+=\s+.*$/\tread_clients = yes/g' /etc/freeradius/3.0/mods-available/sql
+sed -Ei 's/^[\t\s#]*client_table\s+=\s+.*$/\tclient_table = "nas"/g' /etc/freeradius/3.0/mods-available/sql
 
 # Create a soft link for sql module under
-sudo ln -s /etc/freeradius/3.0/mods-enabled/sql /etc/freeradius/3.0/mods-available
+sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/
 
 # Set the proper permission
 sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
@@ -129,12 +129,16 @@ sudo cp daloradius.conf.php.sample daloradius.conf.php
 sudo chown www-data:www-data daloradius.conf.php
 
 # Make the following changes that match your database:
-sudo nano daloradius.conf.php 
+sed -Ei "s/^.*CONFIG_DB_HOST'\].*$/\$configValues['CONFIG_DB_HOST'] = '${DB_HOST}';/" /var/www/daloradius/app/common/includes/daloradius.conf.php
+sed -Ei "s/^.*CONFIG_DB_PORT'\].*$/\$configValues['CONFIG_DB_PORT'] = '${DB_PORT}';/" /var/www/daloradius/app/common/includes/daloradius.conf.php
+sed -Ei "s/^.*CONFIG_DB_USER'\].*$/\$configValues['CONFIG_DB_USER'] = '${DB_USER}';/" /var/www/daloradius/app/common/includes/daloradius.conf.php
+sed -Ei "s/^.*CONFIG_DB_PASS'\].*$/\$configValues['CONFIG_DB_PASS'] = '${DB_PASS}';/" /var/www/daloradius/app/common/includes/daloradius.conf.php
+sed -Ei "s/^.*CONFIG_DB_NAME'\].*$/\$configValues['CONFIG_DB_NAME'] = '${DB_SCHEMA}';/" /var/www/daloradius/app/common/includes/daloradius.conf.php
+
 sudo chmod -R 664 daloradius.conf.php
+sudo chown www-data:www-data /var/www/daloradius/contrib/scripts/dalo-crontab
 
-chown www-data:www-data /var/www/daloradius/contrib/scripts/dalo-crontab
-
-chown -R www-data:www-data /var/log/syslog
+sudo chown -R www-data:www-data /var/log/syslog
 cd /var/www/daloradius/
 mkdir -p var/{log,backup}
 chown -R www-data:www-data var  
