@@ -23,8 +23,8 @@ sudo apt install -y ufw
 sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 8000/tcp
-sudo ufw allow 1812/tcp
-sudo ufw allow 1813/tcp
+sudo ufw allow 1812/udp
+sudo ufw allow 1813/udp
 sudo ufw enable 
 sudo ufw reload
 
@@ -89,7 +89,7 @@ sudo systemctl enable freeradius.service
 sudo systemctl restart freeradius.service
 
 # Install daloradius
-cd /var/www/html/
+cd /var/www/
 sudo apt -y install git
 git clone https://github.com/lirantal/daloradius.git
 
@@ -98,10 +98,10 @@ cd /var/www/html/daloradius/contrib/db/
 mariadb -u root -p raddb < fr3-mariadb-freeradius.sql
 mariadb -u root -p raddb < mariadb-daloradius.sql
 
-sudo chown -R www-data:www-data /var/www/html/daloradius/
-sudo chmod -R 755 /var/www/html/daloradius/
+sudo chown -R www-data:www-data /var/www/daloradius/
+sudo chmod -R 755 /var/www/daloradius/
 
-cd /var/www/html/daloradius/app/common/includes/
+cd /var/www/daloradius/app/common/includes/
 sudo cp daloradius.conf.php.sample daloradius.conf.php
 sudo chown www-data:www-data daloradius.conf.php
 
@@ -109,10 +109,10 @@ sudo chown www-data:www-data daloradius.conf.php
 sudo nano daloradius.conf.php 
 sudo chmod -R 664 daloradius.conf.php
 
-chown www-data:www-data /var/www/html/daloradius/contrib/scripts/dalo-crontab
+chown www-data:www-data /var/www/daloradius/contrib/scripts/dalo-crontab
 
 chown -R www-data:www-data /var/log/syslog
-cd /var/www/html/daloradius/
+cd /var/www/daloradius/
 mkdir -p var/{log,backup}
 chown -R www-data:www-data var  
 chmod -R 775 var
@@ -133,15 +133,15 @@ EOF
 sudo tee /etc/apache2/sites-available/operators.conf<<EOF
 <VirtualHost *:8000>
         ServerAdmin operators@localhost
-        DocumentRoot /var/www/html/daloradius/app/operators
+        DocumentRoot /var/www/daloradius/app/operators
 
-    <Directory /var/www/html/daloradius/app/operators>
+    <Directory /var/www/daloradius/app/operators>
         Options -Indexes +FollowSymLinks
         AllowOverride None
         Require all granted
     </Directory>
 
-    <Directory /var/www/html/daloradius>
+    <Directory /var/www/daloradius>
         Require all denied
     </Directory>
 
@@ -153,15 +153,15 @@ EOF
 sudo tee /etc/apache2/sites-available/users.conf<<EOF
 <VirtualHost *:80>
         ServerAdmin users@localhost
-        DocumentRoot /var/www/html/daloradius/app/users
+        DocumentRoot /var/www/daloradius/app/users
 
-    <Directory /var/www/html/daloradius/app/users>
+    <Directory /var/www/daloradius/app/users>
         Options -Indexes +FollowSymLinks
         AllowOverride None
         Require all granted
     </Directory>
 
-    <Directory /var/www/html/daloradius>
+    <Directory /var/www/daloradius>
         Require all denied
     </Directory>
 
