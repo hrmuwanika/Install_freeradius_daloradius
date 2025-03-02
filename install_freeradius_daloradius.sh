@@ -140,6 +140,9 @@ sudo chmod -R 664 daloradius.conf.php
 sudo chown www-data:www-data /var/www/daloradius/contrib/scripts/dalo-crontab
 
 sudo chown -R www-data:www-data /var/log/syslog
+sudo chown -R www-data:www-data /var/log/boot.log
+sudo chown -R www-data:www-data /var/www/daloradius/var/log/daloradius.log
+
 cd /var/www/daloradius/
 mkdir -p var/{log,backup}
 chown -R www-data:www-data var  
