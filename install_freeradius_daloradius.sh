@@ -86,7 +86,7 @@ sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabl
 # Make the following changes as per your database:
 sudo nano /etc/freeradius/3.0/mods-enabled/sql
 
-sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-available/sql
+sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-enabled/sql
 
 # Set the proper permission
 sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
