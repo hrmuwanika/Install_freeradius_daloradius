@@ -141,6 +141,8 @@ sudo chown www-data:www-data /var/www/daloradius/contrib/scripts/dalo-crontab
 
 sudo chown -R www-data:www-data /var/log/syslog
 sudo chown -R www-data:www-data /var/log/boot.log
+sudo mkdir /var/www/daloradius/var/log/
+sudo touch /var/www/daloradius/var/log/daloradius.log
 sudo chown -R www-data:www-data /var/www/daloradius/var/log/daloradius.log
 
 cd /var/www/daloradius/
