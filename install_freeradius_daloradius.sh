@@ -102,8 +102,13 @@ git clone https://github.com/lirantal/daloradius.git
 
 # Configuring daloradius
 cd /var/www/daloradius/contrib/db/
-mariadb -u root -p raddb < fr3-mariadb-freeradius.sql
-mariadb -u root -p raddb < mariadb-daloradius.sql
+sudo mariadb -u root -p << MYSQLCREOF
+use raddb;
+\. /var/www/daloradius/contrib/db/fr3-mariadb-freeradius.sql
+\. /var/www/daloradius/contrib/db/mariadb-daloradius.sql
+show tables;
+EXIT;
+MYSQLCREOF
 
 sudo chown -R www-data:www-data /var/www/daloradius/
 sudo chmod -R 755 /var/www/daloradius/
