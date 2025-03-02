@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # Set default values for variables
-
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=raduser
+DB_PASS=radpass
+DB_SCHEMA=raddb
 
 #--------------------------------------------------
 # Update Server
@@ -62,12 +66,12 @@ sudo apt -y install freeradius freeradius-mysql freeradius-utils
 cd /etc/freeradius/3.0/mods-config/sql/main/mysql
 # Create radius database, import the freeradius MySQL database schema with the following command:
 sudo mariadb -u root -p << MYSQLCREOF
-CREATE DATABASE raddb;
-CREATE USER 'raduser'@'localhost' IDENTIFIED BY 'radpass';
-GRANT ALL PRIVILEGES ON raddb.* TO 'raduser'@'localhost';
+CREATE DATABASE ${DB_SCHEMA};
+CREATE USER '${DB_USER}'@'${DB_HOST}' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON ${DB_SCHEMA}.* TO '${DB_USER}'@'${DB_HOST}';
 FLUSH PRIVILEGES;
 
-use raddb;
+use ${DB_SCHEMA};
 \. /etc/freeradius/3.0/mods-config/sql/main/mysql/schema.sql
 show tables;
 EXIT;
@@ -84,7 +88,19 @@ sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabl
 # sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
 # Make the following changes as per your database:
-sudo nano /etc/freeradius/3.0/mods-enabled/sql
+# sudo nano /etc/freeradius/3.0/mods-enabled/sql
+
+
+sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei 's/^[\t\s#]*dialect\s+=\s+.*$/\tdialect = "mysql"/g' /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei 's/^[\t\s#]*driver\s+=\s+"rlm_sql_null"/\tdriver = "rlm_sql_\${dialect}"/g' /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei "s/^[\t\s#]*server\s+=\s+\"localhost\"/\tserver = \"${DB_HOST}\"/g" /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei "s/^[\t\s#]*port\s+=\s+[0-9]+/\tport = ${DB_PORT}/g" /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei "s/^[\t\s#]*login\s+=\s+\"radius\"/\tlogin = \"${DB_USER}\"/g" /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei "s/^[\t\s#]*password\s+=\s+\"radpass\"/\tpassword = \"${DB_PASS}\"/g" /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei "s/^[\t\s#]*radius_db\s+=\s+\"radius\"/\tradius_db = \"${DB_SCHEMA}\"/g" /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei 's/^[\t\s#]*read_clients\s+=\s+.*$/\tread_clients = yes/g' /etc/freeradius/3.0/mods-enabled/sql
+sed -Ei 's/^[\t\s#]*client_table\s+=\s+.*$/\tclient_table = "nas"/g' /etc/freeradius/3.0/mods-enabled/sql
 
 sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-enabled/sql
 
@@ -103,7 +119,7 @@ git clone https://github.com/lirantal/daloradius.git
 # Configuring daloradius
 cd /var/www/daloradius/contrib/db/
 sudo mariadb -u root -p << MYSQLCREOF
-use raddb;
+use ${DB_SCHEMA};
 \. /var/www/daloradius/contrib/db/fr3-mariadb-freeradius.sql
 \. /var/www/daloradius/contrib/db/mariadb-daloradius.sql
 show tables;
