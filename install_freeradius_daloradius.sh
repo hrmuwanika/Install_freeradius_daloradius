@@ -61,7 +61,7 @@ sudo systemctl enable mariadb.service
 
 # Install FreeRADIUS
 sudo apt policy freeradius -y
-sudo apt -y install freeradius freeradius-mysql freeradius-utils
+sudo apt -y install freeradius freeradius-common freeradius-mysql freeradius-utils
 
 cd /etc/freeradius/3.0/mods-config/sql/main/mysql
 # Create radius database, import the freeradius MySQL database schema with the following command:
@@ -79,18 +79,12 @@ MYSQLCREOF
 
 sudo systemctl restart mariadb.service
 
-# Create a soft link for sql module under
-sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/
-
 # Run the following commands to create the Certificate Authority (CA) keys:
 # cd /etc/ssl/certs/
 # sudo openssl genrsa 2048 > ca-key.pem
 # sudo openssl req -sha1 -new -x509 -nodes -days 3650 -key ca-key.pem > ca-cert.pem
 
 # Make the following changes as per your database:
-# sudo nano /etc/freeradius/3.0/mods-enabled/sql
-
-
 sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-enabled/sql
 sed -Ei 's/^[\t\s#]*dialect\s+=\s+.*$/\tdialect = "mysql"/g' /etc/freeradius/3.0/mods-enabled/sql
 sed -Ei 's/^[\t\s#]*driver\s+=\s+"rlm_sql_null"/\tdriver = "rlm_sql_\${dialect}"/g' /etc/freeradius/3.0/mods-enabled/sql
@@ -102,7 +96,8 @@ sed -Ei "s/^[\t\s#]*radius_db\s+=\s+\"radius\"/\tradius_db = \"${DB_SCHEMA}\"/g"
 sed -Ei 's/^[\t\s#]*read_clients\s+=\s+.*$/\tread_clients = yes/g' /etc/freeradius/3.0/mods-enabled/sql
 sed -Ei 's/^[\t\s#]*client_table\s+=\s+.*$/\tclient_table = "nas"/g' /etc/freeradius/3.0/mods-enabled/sql
 
-sed -Ei '/^[\t\s#]*tls\s+\{/, /[\t\s#]*\}/ s/^/#/' /etc/freeradius/3.0/mods-enabled/sql
+# Create a soft link for sql module under
+sudo ln -s /etc/freeradius/3.0/mods-enabled/sql /etc/freeradius/3.0/mods-available
 
 # Set the proper permission
 sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
